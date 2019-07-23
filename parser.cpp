@@ -49,7 +49,21 @@ void Parser::read_file()
 {
     if (contents.empty() && m_parsed == 0)
     {
-        contents.assign((std::istreambuf_iterator<char>(*in)), std::istreambuf_iterator<char>());
+        if (m_source == source::file)
+        {
+            contents.assign((std::istreambuf_iterator<char>(*in)), std::istreambuf_iterator<char>());
+        }
+        else
+        {
+            while (1)
+            {
+                contents += static_cast<char>(in->get());
+                if (contents.size() >= 2 && contents[contents.size() - 2] == ';' && contents[contents.size() - 1] == ';')
+                {
+                    break;
+                }
+            }
+        }
         if (contents.back() != '\n')
         {
             contents.push_back('\n');
@@ -80,11 +94,12 @@ void Parser::parse_tokens(std::queue<const Instruction*>& instr)
         }
     }
     m_parsed = 1;
+    InstructionError::set_line(0);
 }
 
 void Parser::parse_instructions(std::queue<const Instruction*>& instr, std::string str)
 {
-    std::regex instr_pattern("^([^ ]*)( ([^ ]*))*$");
+    std::regex instr_pattern("^([^ ;]*)( ([^ ;]*))*[;]?.*$");
     std::string instruction;
     std::vector<std::pair<std::string, std::string>> params;
     std::regex_token_iterator<std::string::iterator> it(str.begin(), str.end(), instr_pattern, {1});
@@ -105,7 +120,10 @@ void Parser::parse_instructions(std::queue<const Instruction*>& instr, std::stri
             std::string str2 = it->str();
             parse_params(params, str2);
         }
-        instr.push(m_if.createInstruction(instruction, params));
+        if (instruction.size() > 0 || params.size() > 0)
+        {
+            instr.push(m_if.createInstruction(instruction, params));
+        }
         ++it;
     }
     params.clear();

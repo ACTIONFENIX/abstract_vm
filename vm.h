@@ -11,7 +11,7 @@
 class Vm
 {
 public:
-    Vm() = default;
+    Vm();
 
     Vm(const std::string& filename);
 
@@ -20,7 +20,11 @@ public:
     void run();
 
 private:
+    void parse();
+
     void release_instructions();
+
+    void release_operands();
 
 private:
     Parser m_parser;

@@ -42,6 +42,7 @@ void Pop::exec(std::vector<const IOperand*>& stack) const
 {
     if (stack.size() > 0)
     {
+        delete stack.back();
         stack.pop_back();
     }
     else

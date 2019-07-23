@@ -1,8 +1,36 @@
 #include "operand.h"
 
-Int8::Int8(const std::string& val): OperandBase(std::stoi(val))
+Int8::Int8(const std::string& val): OperandBase(val)
 {
-
+    int n;
+    try
+    {
+        n = std::stoi(val);
+    }
+    catch (std::out_of_range)
+    {
+        if (val[0] == '-')
+        {
+            throw ValueUnderflow(val, "int8");
+        }
+        else
+        {
+            throw ValueOverflow(val, "int8");
+        }
+    }
+    catch (...)
+    {
+        throw;
+    }
+    if (n < std::numeric_limits<int8_t>::min())
+    {
+        throw ValueUnderflow(val, "int8");
+    }
+    if (n > std::numeric_limits<int8_t>::max())
+    {
+        throw ValueOverflow(val, "int8");
+    }
+    m_val = static_cast<int8_t>(n);
 }
 
 int Int8::getPrecision(void) const
@@ -15,9 +43,37 @@ eOperandType Int8::getType(void) const
     return eOperandType::Int8;
 }
 
-Int16::Int16(const std::string& val): OperandBase(std::stoi(val))
+Int16::Int16(const std::string& val): OperandBase(val)
 {
-
+    int n;
+    try
+    {
+        n = std::stoi(val);
+    }
+    catch (std::out_of_range)
+    {
+        if (val[0] == '-')
+        {
+            throw ValueUnderflow(val, "int16");
+        }
+        else
+        {
+            throw ValueOverflow(val, "int16");
+        }
+    }
+    catch (...)
+    {
+        throw;
+    }
+    if (n < std::numeric_limits<int16_t>::min())
+    {
+        throw ValueUnderflow(val, "int16");
+    }
+    if (n > std::numeric_limits<int16_t>::max())
+    {
+        throw ValueOverflow(val, "int16");
+    }
+    m_val = static_cast<int16_t>(n);
 }
 
 int Int16::getPrecision(void) const
@@ -30,9 +86,27 @@ eOperandType Int16::getType(void) const
     return eOperandType::Int16;
 }
 
-Int32::Int32(const std::string& val): OperandBase(std::stoi(val))
+Int32::Int32(const std::string& val): OperandBase(val)
 {
-
+    try
+    {
+        m_val = std::stoi(val);
+    }
+    catch (std::out_of_range)
+    {
+        if (val[0] == '-')
+        {
+            throw ValueUnderflow(val, "int32");
+        }
+        else
+        {
+            throw ValueOverflow(val, "int32");
+        }
+    }
+    catch (...)
+    {
+        throw;
+    }
 }
 
 int Int32::getPrecision(void) const
@@ -45,9 +119,27 @@ eOperandType Int32::getType(void) const
     return eOperandType::Int32;
 }
 
-Float::Float(const std::string& val): OperandBase(std::stof(val))
+Float::Float(const std::string& val): OperandBase(val)
 {
-
+    try
+    {
+        m_val = std::stof(val);
+    }
+    catch (std::out_of_range)
+    {
+        if (val[0] == '-')
+        {
+            throw ValueUnderflow(val, "float");
+        }
+        else
+        {
+            throw ValueOverflow(val, "float");
+        }
+    }
+    catch (...)
+    {
+        throw;
+    }
 }
 
 int Float::getPrecision(void) const
@@ -60,9 +152,27 @@ eOperandType Float::getType(void) const
     return eOperandType::Float;
 }
 
-Double::Double(const std::string& val): OperandBase(std::stod(val))
+Double::Double(const std::string& val): OperandBase(val)
 {
-
+    try
+    {
+        m_val = std::stod(val);
+    }
+    catch (std::out_of_range)
+    {
+        if (val[0] == '-')
+        {
+            throw ValueUnderflow(val, "double");
+        }
+        else
+        {
+            throw ValueOverflow(val, "double");
+        }
+    }
+    catch (...)
+    {
+        throw;
+    }
 }
 
 int Double::getPrecision(void) const

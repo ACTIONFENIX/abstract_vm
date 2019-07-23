@@ -24,5 +24,8 @@ HEADERS += \
     vm.h
 
 DISTFILES += \
+    Makefile \
     file.txt \
     file2.txt
+
+QMAKE_CXXFLAGS += -Wall -Wextra -Werror

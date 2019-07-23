@@ -2,6 +2,8 @@
 #include "operand.h"
 #include "instructionerror.h"
 
+constexpr const IOperand * (OperandFactory::*OperandFactory::m_create[])(std::string const & value) const;
+
 OperandFactory::OperandFactory()
 {
     m_type.insert(std::make_pair("int8", 0));

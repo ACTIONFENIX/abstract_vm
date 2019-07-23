@@ -3,6 +3,7 @@
 
 #include "operandfactory.h"
 #include "instructionerror.h"
+#include <limits>
 #include <string>
 
 enum class eOperandType
@@ -49,7 +50,7 @@ template<typename T>
 class OperandBase: public IOperand
 {
 public:
-    OperandBase(T val);
+    OperandBase(const std::string& val);
 
     IOperand const *operator+(const IOperand &src) const override;
 
@@ -63,17 +64,19 @@ public:
 
     std::string const &toString(void) const override;
 
-private:
+protected:
     T m_val;
     const std::string m_str;
     OperandFactory m_factory;
 };
 
 template<typename T>
-OperandBase<T>::OperandBase(T val): m_val(val), m_str(std::to_string(m_val))
+OperandBase<T>::OperandBase(const std::string& val): m_str(val)
 {
 
 }
+
+#include <iostream>
 
 template<typename T>
 IOperand const *OperandBase<T>::operator+(const IOperand &src) const

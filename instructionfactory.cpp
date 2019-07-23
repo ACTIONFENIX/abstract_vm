@@ -1,5 +1,7 @@
 #include "instructionfactory.h"
 
+constexpr Instruction *(InstructionFactory::*InstructionFactory::m_create[])(const std::vector<std::pair<std::string, std::string>>& params) const;
+
 InstructionFactory::InstructionFactory()
 {
     m_type.insert(std::make_pair("push", 0));
