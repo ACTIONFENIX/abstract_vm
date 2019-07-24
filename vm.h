@@ -15,6 +15,10 @@ public:
 
     Vm(const std::string& filename);
 
+    Vm(const Vm&) = default;
+
+    Vm& operator=(const Vm&) = default;
+
     ~Vm();
 
     void run();

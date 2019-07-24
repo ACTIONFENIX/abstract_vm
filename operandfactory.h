@@ -9,30 +9,37 @@ class IOperand;
 
 #include <map>
 
+//Factory method for operands
 class OperandFactory
 {
 public:
-    OperandFactory();
+    OperandFactory() = default;
 
-    IOperand const * createOperand( eOperandType type, std::string const & value ) const;
+    OperandFactory(const OperandFactory&) = default;
 
-    IOperand const * createOperand(const std::string& type, std::string const & value ) const;
+    OperandFactory& operator=(const OperandFactory&) = default;
+
+    ~OperandFactory() = default;
+
+    const IOperand *createOperand( eOperandType type, std::string const & value ) const;
+
+    const IOperand *createOperand(const std::string& type, std::string const & value ) const;
 
     eOperandType to_operand_type(const std::string& type) const;
 
 private:
-    IOperand const * createInt8( std::string const & value ) const;
+    const IOperand *createInt8( std::string const & value ) const;
 
-    IOperand const * createInt16( std::string const & value ) const;
+    const IOperand *createInt16( std::string const & value ) const;
 
-    IOperand const * createInt32( std::string const & value ) const;
+    const IOperand *createInt32( std::string const & value ) const;
 
-    IOperand const * createFloat( std::string const & value ) const;
+    const IOperand *createFloat( std::string const & value ) const;
 
-    IOperand const * createDouble( std::string const & value ) const;
+    const IOperand *createDouble( std::string const & value ) const;
 
 private:
-    static constexpr const IOperand * (OperandFactory::*m_create[])(std::string const & value) const =
+    static constexpr const IOperand *(OperandFactory::*m_create[])(std::string const & value) const =
     {
         &OperandFactory::createInt8,
         &OperandFactory::createInt16,
@@ -41,7 +48,7 @@ private:
         &OperandFactory::createDouble
     };
 
-    std::map<std::string, int> m_type;
+    static const std::map<std::string, int> m_type;
 };
 
 #endif //OPERANDFACTORY_H

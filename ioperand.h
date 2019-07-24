@@ -41,6 +41,8 @@ public:
 
     virtual IOperand const *operator%(const IOperand &src) const = 0;
 
+    virtual IOperand const *operator-() const = 0;
+
     virtual std::string const &toString(void) const = 0;
 
     virtual ~IOperand(void) = default;
@@ -50,7 +52,13 @@ template<typename T>
 class OperandBase: public IOperand
 {
 public:
-    OperandBase(const std::string& val);
+    OperandBase() = default;
+
+    OperandBase(const OperandBase&) = default;
+
+    OperandBase& operator=(const OperandBase&) = default;
+
+    ~OperandBase() override = default;
 
     IOperand const *operator+(const IOperand &src) const override;
 
@@ -62,21 +70,15 @@ public:
 
     IOperand const *operator%(const IOperand &src) const override;
 
+    IOperand const *operator-() const override;
+
     std::string const &toString(void) const override;
 
 protected:
     T m_val;
-    const std::string m_str;
+    std::string m_str;
     OperandFactory m_factory;
 };
-
-template<typename T>
-OperandBase<T>::OperandBase(const std::string& val): m_str(val)
-{
-
-}
-
-#include <iostream>
 
 template<typename T>
 IOperand const *OperandBase<T>::operator+(const IOperand &src) const
@@ -120,6 +122,12 @@ IOperand const *OperandBase<T>::operator%(const IOperand &src) const
     {
         throw ModulusByZero();
     }
+}
+
+template<typename T>
+IOperand const *OperandBase<T>::operator-() const
+{
+    return m_factory.createOperand(getType(), std::to_string(-m_val));
 }
 
 template<>

@@ -18,13 +18,22 @@ enum class InstructionType
     div,
     mod,
     print,
-    exit
+    exit,
+    neg,
+    pushl
 };
 
+//Factory method for instructions
 class InstructionFactory
 {
 public:
-    InstructionFactory();
+    InstructionFactory() = default;
+
+    InstructionFactory(const InstructionFactory&) = default;
+
+    InstructionFactory& operator=(const InstructionFactory&) = default;
+
+    ~InstructionFactory() = default;
 
     Instruction *createInstruction(InstructionType type, const std::vector<std::pair<std::string, std::string>>& params = std::vector<std::pair<std::string, std::string>>()) const;
 
@@ -53,6 +62,10 @@ private:
 
     Instruction *createExit(const std::vector<std::pair<std::string, std::string>>& params) const;
 
+    Instruction *createNeg(const std::vector<std::pair<std::string, std::string>>& params) const;
+
+    Instruction *createPushl(const std::vector<std::pair<std::string, std::string>>& params) const;
+
 private:
     static constexpr Instruction *(InstructionFactory::*m_create[])(const std::vector<std::pair<std::string, std::string>>& params) const =
     {
@@ -66,10 +79,12 @@ private:
         &InstructionFactory::createDiv,
         &InstructionFactory::createMod,
         &InstructionFactory::createPrint,
-        &InstructionFactory::createExit
+        &InstructionFactory::createExit,
+        &InstructionFactory::createNeg,
+        &InstructionFactory::createPushl
     };
 
-    std::map<std::string, int> m_type;
+    static const std::map<std::string, int> m_type;
 };
 
 #endif //INSTRUCTIONFACTORY_H

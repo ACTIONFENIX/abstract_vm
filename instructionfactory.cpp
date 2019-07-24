@@ -2,20 +2,22 @@
 
 constexpr Instruction *(InstructionFactory::*InstructionFactory::m_create[])(const std::vector<std::pair<std::string, std::string>>& params) const;
 
-InstructionFactory::InstructionFactory()
+const std::map<std::string, int> InstructionFactory::m_type =
 {
-    m_type.insert(std::make_pair("push", 0));
-    m_type.insert(std::make_pair("pop", 1));
-    m_type.insert(std::make_pair("dump", 2));
-    m_type.insert(std::make_pair("assert", 3));
-    m_type.insert(std::make_pair("add", 4));
-    m_type.insert(std::make_pair("sub", 5));
-    m_type.insert(std::make_pair("mul", 6));
-    m_type.insert(std::make_pair("div", 7));
-    m_type.insert(std::make_pair("mod", 8));
-    m_type.insert(std::make_pair("print", 9));
-    m_type.insert(std::make_pair("exit", 10));
-}
+    {"push", 0},
+    {"pop", 1},
+    {"dump", 2},
+    {"assert", 3},
+    {"add", 4},
+    {"sub", 5},
+    {"mul", 6},
+    {"div", 7},
+    {"mod", 8},
+    {"print", 9},
+    {"exit", 10},
+    {"neg", 11},
+    {"pushl", 12}
+};
 
 Instruction *InstructionFactory::createInstruction(InstructionType type, const std::vector<std::pair<std::string, std::string>>& params) const
 {
@@ -93,4 +95,14 @@ Instruction *InstructionFactory::createPrint(const std::vector<std::pair<std::st
 Instruction *InstructionFactory::createExit(const std::vector<std::pair<std::string, std::string>>& params) const
 {
     return new Exit(params);
+}
+
+Instruction *InstructionFactory::createNeg(const std::vector<std::pair<std::string, std::string>>& params) const
+{
+    return new Neg(params);
+}
+
+Instruction *InstructionFactory::createPushl(const std::vector<std::pair<std::string, std::string>>& params) const
+{
+    return new Pushl(params);
 }

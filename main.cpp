@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-    if (argc == 1)
+    if (argc == 1) //if no parameters passed, read from standard input
     {
         try
         {
@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
             std::cerr << "Unknown error occured." << std::endl;
         }
     }
-    else if (argc == 2)
+    else if (argc == 2) //otherwise read from file
     {
         try
         {

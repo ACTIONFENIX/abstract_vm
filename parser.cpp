@@ -17,7 +17,7 @@ Parser::Parser(const std::string& filename): m_filename(filename), m_source(sour
 
 void Parser::open_stream()
 {
-    if (in == nullptr)
+    if (in == nullptr) //if in is not nullptr, then parsing error appeared and function is called not for the first time
     {
         if (m_source == source::file)
         {
@@ -58,13 +58,13 @@ void Parser::read_file()
             while (1)
             {
                 contents += static_cast<char>(in->get());
-                if (contents.size() >= 2 && contents[contents.size() - 2] == ';' && contents[contents.size() - 1] == ';')
+                if (contents.size() >= 2 && contents[contents.size() - 2] == ';' && contents[contents.size() - 1] == ';') //if reading form standar input, ;; is equal to eof
                 {
                     break;
                 }
             }
         }
-        if (contents.back() != '\n')
+        if (contents.back() != '\n') //is needed for token_pattern regex
         {
             contents.push_back('\n');
         }
@@ -80,12 +80,12 @@ void Parser::parse_tokens(std::queue<const Instruction*>& instr)
     while (std::regex_search(contents, tokens, token_pattern))
     {
         ++m_line;
-        InstructionError::set_line(m_line);
+        InstructionError::set_line(m_line); //show specified line in exception texts
         line_instr = tokens[1];
         contents = tokens.suffix().str();
         try
         {
-            parse_instructions(instr, line_instr);
+            parse_instructions(instr, line_instr); //pass single line with instruction and its parameters and comments
         }
         catch (...)
         {
@@ -94,12 +94,12 @@ void Parser::parse_tokens(std::queue<const Instruction*>& instr)
         }
     }
     m_parsed = 1;
-    InstructionError::set_line(0);
+    InstructionError::set_line(0); //do not show lines in exception texts
 }
 
 void Parser::parse_instructions(std::queue<const Instruction*>& instr, std::string str)
 {
-    std::regex instr_pattern("^([^ ;]*)( ([^ ;]*))*[;]?.*$");
+    std::regex instr_pattern("^([^ ;]*)(( ([^ ;]+))*)[ ]?(;.*)?$"); //instruction params ;comments
     std::string instruction;
     std::vector<std::pair<std::string, std::string>> params;
     std::regex_token_iterator<std::string::iterator> it(str.begin(), str.end(), instr_pattern, {1});
@@ -112,55 +112,61 @@ void Parser::parse_instructions(std::queue<const Instruction*>& instr, std::stri
     {
         throw ParseError(std::string("Line ") + std::to_string(m_line) + " is not an instruction.");
     }
-    it = std::regex_token_iterator<std::string::iterator>(str.begin(), str.end(), instr_pattern, {3});
-    while (it != rend)
+    it = std::regex_token_iterator<std::string::iterator>(str.begin(), str.end(), instr_pattern, {2});
+    if (it != rend)
     {
         if (it->str().size() > 0)
         {
-            std::string str2 = it->str();
-            parse_params(params, str2);
+            parse_params(params, it->str()); //pass only parameters
         }
         if (instruction.size() > 0 || params.size() > 0)
         {
             instr.push(m_if.createInstruction(instruction, params));
         }
-        ++it;
     }
-    params.clear();
 }
 
 void Parser::parse_params(std::vector<std::pair<std::string, std::string>> &params, std::string str)
 {
-    std::smatch param_match;
-    std::regex param_pattern("^([^\\(]*)\\((.*)\\)$");
-    std::regex n_param_pattern("[-]?[\\d]+");
-    std::regex z_param_pattern("[-]?[\\d]+\\.[\\d]+");
+    std::regex params_pattern(R"(^( ([^\(]+)\(([^\)]+)\))*$)"); //general parameters pattern
+    std::regex param_pattern(R"( ([^\(]+)\(([^\)]+)\))"); //pattern to get single parameters
+    std::regex n_value_pattern(R"([-]?[\d]+)"); //pattern for integer numbers
+    std::regex z_value_pattern(R"([-]?[\d]+\.[\d]+)"); //pattern for real numbers
+    std::string value_type;
+    std::string value;
 
-    if (std::regex_match(str, param_match, param_pattern))
+    if (std::regex_match(str, params_pattern))
     {
-        if (param_match[1] == "float" || param_match[1] == "double")
+        std::regex_token_iterator<std::string::iterator> it(str.begin(), str.end(), param_pattern, {1, 2});
+        std::regex_token_iterator<std::string::iterator> rend;
+        while (it != rend)
         {
-            std::string str2 = param_match[2];
-            if (std::regex_match(str2, z_param_pattern))
+            value_type = it->str();
+            ++it;
+            value = it->str();
+            if (value_type == "float" || value_type == "double")
             {
-                params.push_back(std::make_pair(param_match[1], param_match[2]));
+                if (std::regex_match(value, z_value_pattern))
+                {
+                    params.push_back(std::make_pair(value_type, value));
+                }
+                else
+                {
+                    throw BrokenFloat();
+                }
             }
             else
             {
-                throw BrokenFloat();
+                if (std::regex_match(value, n_value_pattern))
+                {
+                    params.push_back(std::make_pair(value_type, value));
+                }
+                else
+                {
+                    throw BrokenInteger();
+                }
             }
-        }
-        else
-        {
-            std::string str2 = param_match[2];
-            if (std::regex_match(str2, n_param_pattern))
-            {
-                params.push_back(std::make_pair(param_match[1], param_match[2]));
-            }
-            else
-            {
-                throw BrokenInteger();
-            }
+            ++it;
         }
     }
     else

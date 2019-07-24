@@ -181,3 +181,13 @@ const char *ValueUnderflow::what() const noexcept
 {
     return ret.c_str();
 }
+
+PrintError::PrintError() noexcept
+{
+    ret = std::string(InstructionError::what()) + "Instruction [Print] expected int8 value on stack.";
+}
+
+const char *PrintError::what() const noexcept
+{
+    return ret.c_str();
+}

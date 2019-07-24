@@ -1,6 +1,6 @@
 #include "operand.h"
 
-Int8::Int8(const std::string& val): OperandBase(val)
+Int8::Int8(const std::string& val)
 {
     int n;
     try
@@ -31,6 +31,7 @@ Int8::Int8(const std::string& val): OperandBase(val)
         throw ValueOverflow(val, "int8");
     }
     m_val = static_cast<int8_t>(n);
+    m_str = std::to_string(m_val);
 }
 
 int Int8::getPrecision(void) const
@@ -43,7 +44,7 @@ eOperandType Int8::getType(void) const
     return eOperandType::Int8;
 }
 
-Int16::Int16(const std::string& val): OperandBase(val)
+Int16::Int16(const std::string& val)
 {
     int n;
     try
@@ -74,6 +75,7 @@ Int16::Int16(const std::string& val): OperandBase(val)
         throw ValueOverflow(val, "int16");
     }
     m_val = static_cast<int16_t>(n);
+    m_str = std::to_string(m_val);
 }
 
 int Int16::getPrecision(void) const
@@ -86,7 +88,7 @@ eOperandType Int16::getType(void) const
     return eOperandType::Int16;
 }
 
-Int32::Int32(const std::string& val): OperandBase(val)
+Int32::Int32(const std::string& val)
 {
     try
     {
@@ -107,6 +109,7 @@ Int32::Int32(const std::string& val): OperandBase(val)
     {
         throw;
     }
+    m_str = std::to_string(m_val);
 }
 
 int Int32::getPrecision(void) const
@@ -119,7 +122,7 @@ eOperandType Int32::getType(void) const
     return eOperandType::Int32;
 }
 
-Float::Float(const std::string& val): OperandBase(val)
+Float::Float(const std::string& val)
 {
     try
     {
@@ -140,6 +143,7 @@ Float::Float(const std::string& val): OperandBase(val)
     {
         throw;
     }
+    m_str = std::to_string(m_val);
 }
 
 int Float::getPrecision(void) const
@@ -152,7 +156,7 @@ eOperandType Float::getType(void) const
     return eOperandType::Float;
 }
 
-Double::Double(const std::string& val): OperandBase(val)
+Double::Double(const std::string& val)
 {
     try
     {
@@ -173,6 +177,7 @@ Double::Double(const std::string& val): OperandBase(val)
     {
         throw;
     }
+    m_str = std::to_string(m_val);
 }
 
 int Double::getPrecision(void) const

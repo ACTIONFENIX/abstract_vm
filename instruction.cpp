@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <cmath>
 
-Push::Push(const std::vector<std::pair<std::string, std::string>>& params): param_type(params.begin()->first), param(params.begin()->second)
+Push::Push(const std::vector<std::pair<std::string, std::string>>& params)
 {
     if (params.size() < nparams())
     {
@@ -14,6 +14,8 @@ Push::Push(const std::vector<std::pair<std::string, std::string>>& params): para
     {
         throw TooManyParams("Push");
     }
+    param_type = params.begin()->first;
+    param = params.begin()->second;
 }
 
 void Push::exec(std::vector<const IOperand*>& stack) const
@@ -81,7 +83,7 @@ size_t Dump::nparams() const
     return 0;
 }
 
-Assert::Assert(const std::vector<std::pair<std::string, std::string>>& params): param_type(params.begin()->first), param(params.begin()->second)
+Assert::Assert(const std::vector<std::pair<std::string, std::string>>& params)
 {
     if (params.size() < nparams())
     {
@@ -91,11 +93,17 @@ Assert::Assert(const std::vector<std::pair<std::string, std::string>>& params): 
     {
         throw TooManyParams("Assert");
     }
+    param_type = params.begin()->first;
+    param = params.begin()->second;
 }
 
 void Assert::exec(std::vector<const IOperand*>& stack) const
 {
     static constexpr double eps = 1e-10;
+    if (stack.empty())
+    {
+        throw AssertError(param, "no value");
+    }
     if (stack.back()->getType() != m_of.to_operand_type(param_type) || abs(std::stod(stack.back()->toString()) - std::stod(param)) > eps)
     {
         throw AssertError(param, stack.back()->toString());
@@ -157,7 +165,7 @@ void Sub::exec(std::vector<const IOperand*>& stack) const
 {
     if (stack.size() >= 2)
     {
-        const IOperand *res = *stack.back() - *stack[stack.size() - 2];
+        const IOperand *res = *stack[stack.size() - 2] - *stack.back();
         delete stack.back();
         stack.pop_back();
         delete stack.back();
@@ -225,7 +233,7 @@ void Div::exec(std::vector<const IOperand*>& stack) const
 {
     if (stack.size() >= 2)
     {
-        const IOperand *res = *stack.back() / *stack[stack.size() - 2];
+        const IOperand *res = *stack[stack.size() - 2] / *stack.back();
         delete stack.back();
         stack.pop_back();
         delete stack.back();
@@ -291,9 +299,13 @@ Print::Print(const std::vector<std::pair<std::string, std::string>>& params)
 
 void Print::exec(std::vector<const IOperand*>& stack) const
 {
-    if (stack.back()->getType() != m_of.to_operand_type("int8"))
+    if (stack.empty())
     {
         throw NotEnoughArgumentsStack(std::string("Unary instruction [Print] expected 1, but got only 0."));
+    }
+    if (stack.back()->getType() != m_of.to_operand_type("int8"))
+    {
+        throw PrintError();
     }
     else
     {
@@ -324,6 +336,56 @@ void Exit::exec(std::vector<const IOperand*>&) const
 }
 
 size_t Exit::nparams() const
+{
+    return 0;
+}
+
+Neg::Neg(const std::vector<std::pair<std::string, std::string> > &params)
+{
+    if (params.size() < nparams())
+    {
+        throw TooLittleParams("Neg");
+    }
+    if (params.size() > nparams())
+    {
+        throw TooManyParams("Neg");
+    }
+}
+
+void Neg::exec(std::vector<const IOperand *> &stack) const
+{
+    if (stack.size() > 0)
+    {
+        const IOperand *res = -*stack.back();
+        delete stack.back();
+        stack.pop_back();
+        stack.push_back(res);
+    }
+    else
+    {
+        throw NotEnoughArgumentsStack(std::string("Unary instruction [Neg] expected 1, but got only 0."));
+    }
+}
+
+size_t Neg::nparams() const
+{
+    return 0;
+}
+
+Pushl::Pushl(const std::vector<std::pair<std::string, std::string> > &params): m_params(params)
+{
+
+}
+
+void Pushl::exec(std::vector<const IOperand *> &stack) const
+{
+    for (auto i: m_params)
+    {
+        stack.push_back(m_of.createOperand(i.first, i.second));
+    }
+}
+
+size_t Pushl::nparams() const
 {
     return 0;
 }

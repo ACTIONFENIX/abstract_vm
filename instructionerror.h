@@ -4,10 +4,15 @@
 #include <exception>
 #include <string>
 
+//basic class to allmost all exceptions in abstract_vm
 class InstructionError: public std::exception
 {
 public:
     InstructionError() noexcept;
+
+    InstructionError(const InstructionError&) = default;
+
+    InstructionError& operator=(const InstructionError&) = default;
 
     virtual ~InstructionError() = default;
 
@@ -20,6 +25,7 @@ protected:
     std::string ret;
 };
 
+//raises if exit instruction is executed
 class NormalExit: public InstructionError
 {
 public:
@@ -30,6 +36,7 @@ public:
     ~NormalExit() = default;
 };
 
+//raises if no exit instruction was executed
 class NoExit: public InstructionError
 {
 public:
@@ -40,6 +47,7 @@ public:
     ~NoExit() = default;
 };
 
+//raises if instruction got too many parameters
 class TooManyParams: public InstructionError
 {
 public:
@@ -50,6 +58,7 @@ public:
     ~TooManyParams() = default;
 };
 
+//raises if instruction got too little parameters
 class TooLittleParams: public InstructionError
 {
 public:
@@ -60,6 +69,7 @@ public:
     ~TooLittleParams() = default;
 };
 
+//raises if Pop instruction executed on empty stack
 class PopEmptyStack: public InstructionError
 {
 public:
@@ -70,6 +80,7 @@ public:
     ~PopEmptyStack() = default;
 };
 
+//raises while Assert instruction executes if value on top of the stack is not the same as in the parameter
 class AssertError: public InstructionError
 {
 public:
@@ -80,6 +91,7 @@ public:
     ~AssertError() = default;
 };
 
+//raises if there is no at least 2 operands in stack while any binary instruction, like Add, is executed
 class NotEnoughArgumentsStack: public InstructionError
 {
 public:
@@ -90,6 +102,7 @@ public:
     ~NotEnoughArgumentsStack() = default;
 };
 
+//raises if Div instruction divides by 0
 class DivisionByZero: public InstructionError
 {
 public:
@@ -100,6 +113,7 @@ public:
     ~DivisionByZero() = default;
 };
 
+//raises if Mod instruction gets remainder by 0
 class ModulusByZero: public InstructionError
 {
 public:
@@ -110,6 +124,7 @@ public:
     ~ModulusByZero() = default;
 };
 
+//raises if 1 of Mod instruction operands is floating value
 class ModulusByFloat: public InstructionError
 {
 public:
@@ -120,6 +135,7 @@ public:
     ~ModulusByFloat() = default;
 };
 
+//raises if instruction to be created is unknown
 class InstructionUnknown: public InstructionError
 {
 public:
@@ -130,6 +146,7 @@ public:
     ~InstructionUnknown() = default;
 };
 
+//raises if operand type to be created is unknown
 class OperandTypeUnknown: public InstructionError
 {
 public:
@@ -140,6 +157,7 @@ public:
     ~OperandTypeUnknown() = default;
 };
 
+//raises if any unspecified here error occured while parsing program
 class ParseError: public InstructionError
 {
 public:
@@ -150,6 +168,7 @@ public:
     ~ParseError() = default;
 };
 
+//raises if integer operand value is wrong
 class BrokenInteger: public InstructionError
 {
 public:
@@ -160,6 +179,7 @@ public:
     ~BrokenInteger() = default;
 };
 
+//raises if floating point operand value is wrong
 class BrokenFloat: public InstructionError
 {
 public:
@@ -170,7 +190,7 @@ public:
     ~BrokenFloat() = default;
 };
 
-//TO USE
+//raises if while creating operand the value passed to it can't fit in its type
 class ValueOverflow: public InstructionError
 {
 public:
@@ -181,7 +201,7 @@ public:
     ~ValueOverflow() = default;
 };
 
-//TO USE
+//raises if while creating operand the value passed to it can't fit in its type
 class ValueUnderflow: public InstructionError
 {
 public:
@@ -190,6 +210,17 @@ public:
     const char *what() const noexcept;
 
     ~ValueUnderflow() = default;
+};
+
+//raises if while executing Print instruction type of value on the top is not int8
+class PrintError: public InstructionError
+{
+public:
+    PrintError() noexcept;
+
+    const char *what() const noexcept;
+
+    ~PrintError() = default;
 };
 
 #endif // INSTRUCTIONERROR_H

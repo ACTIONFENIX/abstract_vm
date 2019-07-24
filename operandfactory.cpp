@@ -2,18 +2,18 @@
 #include "operand.h"
 #include "instructionerror.h"
 
-constexpr const IOperand * (OperandFactory::*OperandFactory::m_create[])(std::string const & value) const;
+constexpr const IOperand *(OperandFactory::*OperandFactory::m_create[])(std::string const & value) const;
 
-OperandFactory::OperandFactory()
+const std::map<std::string, int> OperandFactory::m_type =
 {
-    m_type.insert(std::make_pair("int8", 0));
-    m_type.insert(std::make_pair("int16", 1));
-    m_type.insert(std::make_pair("int32", 2));
-    m_type.insert(std::make_pair("float", 3));
-    m_type.insert(std::make_pair("double", 4));
-}
+    {"int8", 0},
+    {"int16", 1},
+    {"int32", 2},
+    {"float", 3},
+    {"double", 4}
+};
 
-IOperand const * OperandFactory::createOperand( eOperandType type, std::string const & value ) const
+const IOperand *OperandFactory::createOperand( eOperandType type, std::string const & value ) const
 {
     if (static_cast<unsigned long>(type) >= sizeof(m_create) / sizeof(m_create[0]))
     {
@@ -22,7 +22,7 @@ IOperand const * OperandFactory::createOperand( eOperandType type, std::string c
     return ((*this).*m_create[static_cast<int>(type)])(value);
 }
 
-IOperand const * OperandFactory::createOperand(const std::string& type, std::string const & value ) const
+const IOperand *OperandFactory::createOperand(const std::string& type, std::string const & value ) const
 {
     eOperandType t;
     if (m_type.find(type) != m_type.end())
@@ -41,27 +41,27 @@ eOperandType OperandFactory::to_operand_type(const std::string &type) const
     return static_cast<eOperandType>(m_type.at(type));
 }
 
-IOperand const * OperandFactory::createInt8( std::string const & value ) const
+const IOperand *OperandFactory::createInt8( std::string const & value ) const
 {
     return new Int8(value);
 }
 
-IOperand const * OperandFactory::createInt16( std::string const & value ) const
+const IOperand *OperandFactory::createInt16( std::string const & value ) const
 {
     return new Int16(value);
 }
 
-IOperand const * OperandFactory::createInt32( std::string const & value ) const
+const IOperand *OperandFactory::createInt32( std::string const & value ) const
 {
     return new Int32(value);
 }
 
-IOperand const * OperandFactory::createFloat( std::string const & value ) const
+const IOperand *OperandFactory::createFloat( std::string const & value ) const
 {
     return new Float(value);
 }
 
-IOperand const * OperandFactory::createDouble( std::string const & value ) const
+const IOperand *OperandFactory::createDouble( std::string const & value ) const
 {
     return new Double(value);
 }

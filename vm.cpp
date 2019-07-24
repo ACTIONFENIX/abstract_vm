@@ -20,7 +20,7 @@ Vm::~Vm()
 
 void Vm::run()
 {
-    bool normal_exit = 0;
+    bool normal_exit = 0; //holds 1 if exit instruction appeared
 
     if (!m_parser)
     {
@@ -35,7 +35,7 @@ void Vm::run()
         {
             i->exec(m_stack);
         }
-        catch (NormalExit&)
+        catch (NormalExit&) //if exit instruction appeared
         {
             normal_exit = 1;
         }
@@ -59,7 +59,7 @@ void Vm::run()
 
 void Vm::parse()
 {
-    while (m_parser.parsed() == 0)
+    while (m_parser.parsed() == 0) //parse while not eof, to show all errors in program
     {
         try
         {
